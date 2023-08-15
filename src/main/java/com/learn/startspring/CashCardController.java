@@ -11,7 +11,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/cashcards")
@@ -62,5 +61,15 @@ public class CashCardController {
 
     private CashCard findCashCard(Long requestedId, Principal principal) {
         return cashCardRepository.findByIdAndOwner(requestedId, principal.getName());
+    }
+
+    @DeleteMapping("/{requestedId}")
+    private ResponseEntity<Void> deleteCard(@PathVariable Long requestedId, Principal principal) {
+        boolean recordExists = cashCardRepository.existsByIdAndOwner(requestedId, principal.getName());
+        if (recordExists) {
+            cashCardRepository.deleteById(requestedId);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }
